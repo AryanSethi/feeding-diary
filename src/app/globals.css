@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+:root {
+  --color-meal: #4ade80;
+  --color-meal-light: #bbf7d0;
+  --color-poop: #a16207;
+  --color-poop-light: #d4a574;
+  --color-prediction: rgba(161, 98, 7, 0.2);
+  --color-bg: #fefce8;
+  --color-card: #ffffff;
+  --color-text: #1c1917;
+  --color-text-muted: #78716c;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* Custom scrollbar for timeline */
+.timeline-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.timeline-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.timeline-scroll::-webkit-scrollbar-thumb {
+  background: #d6d3d1;
+  border-radius: 3px;
+}
+
+.timeline-scroll::-webkit-scrollbar-thumb:hover {
+  background: #a8a29e;
+}
