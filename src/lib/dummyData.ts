@@ -53,9 +53,15 @@ export function generateDummyData(): DiaryEvent[] {
   events.push(evt("poop", 2026, 6, 7, 21, 0));
 
   // June 8
-  events.push(evt("meal", 2026, 6, 8, 10, 25));
+  addMeals(2026, 6, 8);
   events.push(evt("poop", 2026, 6, 8, 4, 0));
   events.push(evt("poop", 2026, 6, 8, 10, 30));
+  events.push(evt("poop", 2026, 6, 8, 20, 45));
+
+  // June 9
+  events.push(evt("meal", 2026, 6, 9, 9, 28));
+  events.push(evt("meal", 2026, 6, 9, 13, 31));
+  events.push(evt("poop", 2026, 6, 9, 8, 43));
 
   return events.sort((a, b) => a.timestamp - b.timestamp);
 }

@@ -12,8 +12,11 @@ interface QuickActionsProps {
 export default function QuickActions({ selectedDate, onAddMeal, onAddPoop }: QuickActionsProps) {
   const isToday = new Date().toDateString() === selectedDate.toDateString();
   const [showPastPoop, setShowPastPoop] = useState(false);
+  const [showPastMeal, setShowPastMeal] = useState(false);
   const [pastDate, setPastDate] = useState("");
   const [pastTime, setPastTime] = useState("");
+  const [pastMealDate, setPastMealDate] = useState("");
+  const [pastMealTime, setPastMealTime] = useState("");
 
   const handleNowMeal = () => onAddMeal(Date.now());
   const handleNowPoop = () => onAddPoop(Date.now());
@@ -34,6 +37,17 @@ export default function QuickActions({ selectedDate, onAddMeal, onAddPoop }: Qui
     setPastDate("");
     setPastTime("");
     setShowPastPoop(false);
+  };
+
+  const handlePastMeal = () => {
+    if (!pastMealDate || !pastMealTime) return;
+    const [y, mo, d] = pastMealDate.split("-").map(Number);
+    const [h, m] = pastMealTime.split(":").map(Number);
+    const ts = new Date(y, mo - 1, d, h, m, 0, 0).getTime();
+    onAddMeal(ts);
+    setPastMealDate("");
+    setPastMealTime("");
+    setShowPastMeal(false);
   };
 
   return (
@@ -94,6 +108,52 @@ export default function QuickActions({ selectedDate, onAddMeal, onAddPoop }: Qui
             </button>
             <button
               onClick={() => setShowPastPoop(false)}
+              className="px-3 py-1.5 rounded-lg bg-stone-200 text-stone-600 text-sm font-medium hover:bg-stone-300 transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Add past meal */}
+      <div>
+        {!showPastMeal ? (
+          <button
+            onClick={() => setShowPastMeal(true)}
+            className="w-full py-2 px-4 rounded-xl bg-green-50 hover:bg-green-100 active:bg-green-200 text-green-800 text-sm font-medium border border-green-200 transition-colors"
+          >
+            + Add meal from the past
+          </button>
+        ) : (
+          <div className="flex gap-2 items-end flex-wrap p-3 rounded-xl bg-green-50 border border-green-200">
+            <div>
+              <label className="text-xs text-green-700 font-medium block mb-1">Date</label>
+              <input
+                type="date"
+                value={pastMealDate}
+                onChange={(e) => setPastMealDate(e.target.value)}
+                className="px-2 py-1.5 rounded-lg border border-green-300 text-sm bg-white text-stone-800"
+              />
+            </div>
+            <div>
+              <label className="text-xs text-green-700 font-medium block mb-1">Time</label>
+              <input
+                type="time"
+                value={pastMealTime}
+                onChange={(e) => setPastMealTime(e.target.value)}
+                className="px-2 py-1.5 rounded-lg border border-green-300 text-sm bg-white text-stone-800"
+              />
+            </div>
+            <button
+              onClick={handlePastMeal}
+              disabled={!pastMealDate || !pastMealTime}
+              className="px-3 py-1.5 rounded-lg bg-green-600 text-white text-sm font-medium hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              🍖 Add
+            </button>
+            <button
+              onClick={() => setShowPastMeal(false)}
               className="px-3 py-1.5 rounded-lg bg-stone-200 text-stone-600 text-sm font-medium hover:bg-stone-300 transition-colors"
             >
               Cancel
