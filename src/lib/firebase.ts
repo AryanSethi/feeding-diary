@@ -8,11 +8,13 @@ import {
   query,
   orderBy,
   onSnapshot,
+  getDocs,
   Timestamp,
   type Firestore,
 } from "firebase/firestore";
 import { getAuth, signInAnonymously, type Auth } from "firebase/auth";
 import type { DiaryEvent, EventType } from "./types";
+import { generateDummyData } from "./dummyData";
 
 let app: FirebaseApp | null = null;
 let db: Firestore | null = null;
@@ -94,4 +96,25 @@ export async function addEvent(type: EventType, timestamp: number, notes?: strin
 export async function removeEvent(id: string) {
   await ensureAuth();
   await deleteDoc(doc(getDb(), "events", id));
+}
+
+/**
+ * If Firestore has no events yet, seed it with the real recorded data.
+ * This runs once on first visit after Firebase is configured.
+ */
+export async function seedFirestoreIfEmpty() {
+  if (!isFirebaseConfigured()) return;
+  await ensureAuth();
+  const eventsCollection = collection(getDb(), "events");
+  const snapshot = await getDocs(query(eventsCollection, orderBy("timestamp", "asc")));
+  if (snapshot.size > 0) return; // Already has data
+
+  const seedData = generateDummyData();
+  for (const event of seedData) {
+    await addDoc(eventsCollection, {
+      type: event.type,
+      timestamp: Timestamp.fromMillis(event.timestamp),
+      notes: event.notes || null,
+    });
+  }
 }
