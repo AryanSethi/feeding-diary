@@ -32,7 +32,7 @@ export default function Home() {
   }
 
   return (
-    <main className="max-w-2xl mx-auto px-4 pb-64 md:pb-8">
+    <main className="max-w-6xl mx-auto px-4 pb-64 md:pb-8">
       {/* Header */}
       <header className="pt-6 pb-4 text-center">
         <h1 className="text-2xl font-bold text-stone-800">
@@ -57,7 +57,7 @@ export default function Home() {
           allEvents={events}
           predictions={predictions}
           selectedDate={selectedDate}
-          daysToShow={7}
+          daysToShow={30}
         />
       </div>
 
@@ -77,7 +77,7 @@ export default function Home() {
 
       {/* Quick Actions — floating on mobile, inline on desktop */}
       <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-stone-200 p-4 max-h-[50vh] overflow-y-auto md:static md:bg-transparent md:backdrop-blur-none md:border-0 md:p-0 md:mb-4 md:max-h-none md:overflow-visible">
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <QuickActions
             selectedDate={selectedDate}
             onAddMeal={handleAddMeal}
