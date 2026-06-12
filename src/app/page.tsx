@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useEvents, useEventsForDay } from "@/hooks/useEvents";
 import { usePrediction } from "@/hooks/usePrediction";
 import Timeline from "@/components/Timeline";
@@ -12,6 +12,8 @@ import EventList from "@/components/EventList";
 export default function Home() {
   const { events, loading, add, remove } = useEvents();
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [bottomPad, setBottomPad] = useState(256);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   const dayEvents = useEventsForDay(events, selectedDate);
   const todaysMeals = dayEvents.filter((e) => e.type === "meal");
@@ -19,6 +21,19 @@ export default function Home() {
 
   const handleAddMeal = (timestamp: number) => add("meal", timestamp);
   const handleAddPoop = (timestamp: number) => add("poop", timestamp);
+
+  const measurePanel = useCallback(() => {
+    if (panelRef.current) {
+      setBottomPad(panelRef.current.offsetHeight + 16);
+    }
+  }, []);
+
+  useEffect(() => {
+    measurePanel();
+    const ro = new ResizeObserver(measurePanel);
+    if (panelRef.current) ro.observe(panelRef.current);
+    return () => ro.disconnect();
+  }, [measurePanel]);
 
   if (loading) {
     return (
@@ -32,7 +47,7 @@ export default function Home() {
   }
 
   return (
-    <main className="max-w-6xl mx-auto px-4 pb-64 md:pb-8">
+    <main className="max-w-6xl mx-auto px-4 md:pb-8" style={{ paddingBottom: bottomPad }}>
       {/* Header */}
       <header className="pt-6 pb-4 text-center">
         <h1 className="text-2xl font-bold text-stone-800">
@@ -76,7 +91,7 @@ export default function Home() {
       </div>
 
       {/* Quick Actions — floating on mobile, inline on desktop */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-stone-200 p-4 max-h-[50vh] overflow-y-auto md:static md:bg-transparent md:backdrop-blur-none md:border-0 md:p-0 md:mb-4 md:max-h-none md:overflow-visible">
+      <div ref={panelRef} className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-stone-200 p-4 max-h-[50vh] overflow-y-auto md:static md:bg-transparent md:backdrop-blur-none md:border-0 md:p-0 md:mb-4 md:max-h-none md:overflow-visible">
         <div className="max-w-6xl mx-auto">
           <QuickActions
             selectedDate={selectedDate}
