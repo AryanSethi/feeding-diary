@@ -4,6 +4,9 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Poodle's Diary",
   description: "Feeding & pooping tracker for Poodle the Shih Tzu",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({

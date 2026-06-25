@@ -11,9 +11,10 @@ interface ScatterChartProps {
   yLabel: string;
   color: string;
   height?: number;
+  yTickFormatter?: (value: number) => string;
 }
 
-export default function ScatterChart({ points, yLabel, color, height = 140 }: ScatterChartProps) {
+export default function ScatterChart({ points, yLabel, color, height = 140, yTickFormatter }: ScatterChartProps) {
   if (points.length === 0) return null;
 
   const padding = { top: 10, right: 12, bottom: 24, left: 36 };
@@ -80,7 +81,7 @@ export default function ScatterChart({ points, yLabel, color, height = 140 }: Sc
             fontSize={9}
             fill="#9ca3af"
           >
-            {v.toFixed(1)}
+            {yTickFormatter ? yTickFormatter(v) : v.toFixed(1)}
           </text>
         </g>
       ))}

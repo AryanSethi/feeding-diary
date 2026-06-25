@@ -7,9 +7,10 @@ interface QuickActionsProps {
   selectedDate: Date;
   onAddMeal: (timestamp: number) => void;
   onAddPoop: (timestamp: number) => void;
+  hidePresets?: boolean;
 }
 
-export default function QuickActions({ selectedDate, onAddMeal, onAddPoop }: QuickActionsProps) {
+export default function QuickActions({ selectedDate, onAddMeal, onAddPoop, hidePresets }: QuickActionsProps) {
   const isToday = new Date().toDateString() === selectedDate.toDateString();
   const [showPastPoop, setShowPastPoop] = useState(false);
   const [showPastMeal, setShowPastMeal] = useState(false);
@@ -163,21 +164,23 @@ export default function QuickActions({ selectedDate, onAddMeal, onAddPoop }: Qui
       </div>
 
       {/* Preset meal times */}
-      <div className="flex gap-2 flex-wrap">
-        {MEAL_PRESETS.map((preset) => {
-          const [h, m] = preset.time.split(":").map(Number);
-          const label = `${h > 12 ? h - 12 : h}:${m.toString().padStart(2, "0")} ${h >= 12 ? "PM" : "AM"}`;
-          return (
-            <button
-              key={preset.time}
-              onClick={() => handlePresetMeal(preset.time)}
-              className="px-3 py-1.5 rounded-xl bg-green-50 hover:bg-green-100 active:bg-green-200 text-green-800 text-sm font-medium border border-green-200 transition-colors"
-            >
-              🍖 {preset.label} ({label})
-            </button>
-          );
-        })}
-      </div>
+      {!hidePresets && (
+        <div className="flex gap-2 flex-wrap">
+          {MEAL_PRESETS.map((preset) => {
+            const [h, m] = preset.time.split(":").map(Number);
+            const label = `${h > 12 ? h - 12 : h}:${m.toString().padStart(2, "0")} ${h >= 12 ? "PM" : "AM"}`;
+            return (
+              <button
+                key={preset.time}
+                onClick={() => handlePresetMeal(preset.time)}
+                className="px-3 py-1.5 rounded-xl bg-green-50 hover:bg-green-100 active:bg-green-200 text-green-800 text-sm font-medium border border-green-200 transition-colors"
+              >
+                🍖 {preset.label} ({label})
+              </button>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

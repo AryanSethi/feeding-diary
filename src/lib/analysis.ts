@@ -88,3 +88,46 @@ export function computePoopToPoopIntervals(events: DiaryEvent[]): PoopToPoopInte
 
   return results;
 }
+
+export interface FirstPoopOfDay {
+  timestamp: number;      // the poop timestamp (for x-axis)
+  timeOfDayHours: number; // decimal hours from midnight (for y-axis)
+  timeFormatted: string;  // e.g. "6:30 AM"
+}
+
+/**
+ * For each day that has at least one poop, find the earliest poop
+ * and return its time-of-day.
+ */
+export function computeFirstPoopOfDay(events: DiaryEvent[]): FirstPoopOfDay[] {
+  const poops = events
+    .filter((e) => e.type === "poop")
+    .sort((a, b) => a.timestamp - b.timestamp);
+
+  const dayMap = new Map<string, DiaryEvent>();
+  for (const poop of poops) {
+    const d = new Date(poop.timestamp);
+    const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+    if (!dayMap.has(key)) {
+      dayMap.set(key, poop);
+    }
+  }
+
+  const results: FirstPoopOfDay[] = [];
+  for (const poop of dayMap.values()) {
+    const d = new Date(poop.timestamp);
+    const timeOfDayHours = d.getHours() + d.getMinutes() / 60;
+    const timeFormatted = d.toLocaleTimeString("en-IN", {
+      hour: "numeric",
+      minute: "2-digit",
+      timeZone: "Asia/Kolkata",
+    });
+    results.push({
+      timestamp: poop.timestamp,
+      timeOfDayHours,
+      timeFormatted,
+    });
+  }
+
+  return results.sort((a, b) => a.timestamp - b.timestamp);
+}

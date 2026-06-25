@@ -6,10 +6,11 @@ import type { DiaryEvent, PredictionWindow } from "@/lib/types";
 
 export function usePrediction(
   allEvents: DiaryEvent[],
-  todaysMeals: DiaryEvent[]
+  todaysMeals: DiaryEvent[],
+  todaysEvents: DiaryEvent[]
 ): PredictionWindow[] {
   return useMemo(
-    () => getPredictions(allEvents, todaysMeals),
-    [allEvents, todaysMeals]
+    () => getPredictions(allEvents, todaysMeals, todaysEvents),
+    [allEvents, todaysMeals, todaysEvents]
   );
 }

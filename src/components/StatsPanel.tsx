@@ -1,7 +1,7 @@
 "use client";
 
 import type { DiaryEvent, PredictionWindow } from "@/lib/types";
-import { computeMealToPoopDelays, computePoopToPoopIntervals } from "@/lib/analysis";
+import { computeMealToPoopDelays, computePoopToPoopIntervals, computeFirstPoopOfDay } from "@/lib/analysis";
 import ScatterChart from "./ScatterChart";
 
 interface StatsPanelProps {
@@ -14,6 +14,14 @@ export default function StatsPanel({ allEvents, todaysEvents, predictions }: Sta
   const todaysPoops = todaysEvents.filter((e) => e.type === "poop").length;
   const todaysMeals = todaysEvents.filter((e) => e.type === "meal").length;
 
+  const formatHourMinute = (decimalHours: number) => {
+    const h = Math.floor(decimalHours);
+    const m = Math.round((decimalHours - h) * 60);
+    const period = h < 12 ? "AM" : "PM";
+    const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+    return `${h12}:${m.toString().padStart(2, "0")} ${period}`;
+  };
+
   // Next predicted poop
   const now = Date.now();
   const upcoming = predictions
@@ -24,6 +32,7 @@ export default function StatsPanel({ allEvents, todaysEvents, predictions }: Sta
 
   const mealToPoopDelays = computeMealToPoopDelays(allEvents);
   const poopToPoopIntervals = computePoopToPoopIntervals(allEvents);
+  const firstPoops = computeFirstPoopOfDay(allEvents);
 
   const formatCountdown = (targetMs: number) => {
     const diff = targetMs - now;
@@ -50,7 +59,7 @@ export default function StatsPanel({ allEvents, todaysEvents, predictions }: Sta
               </span>
               <span className="text-sm text-amber-600 ml-2">
                 (~{new Date(nextPrediction.meanTime).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit", timeZone: "Asia/Kolkata" })},
-                after {nextPrediction.mealSlot})
+                {nextPrediction.mealSlot === "Morning" ? " morning routine" : ` after ${nextPrediction.mealSlot}`})
               </span>
             </div>
           ) : (
@@ -120,6 +129,36 @@ export default function StatsPanel({ allEvents, todaysEvents, predictions }: Sta
             <span>Min: {Math.min(...poopToPoopIntervals.map((d) => d.intervalHours)).toFixed(1)}h</span>
             <span>Avg: {(poopToPoopIntervals.reduce((s, d) => s + d.intervalHours, 0) / poopToPoopIntervals.length).toFixed(1)}h</span>
             <span>Max: {Math.max(...poopToPoopIntervals.map((d) => d.intervalHours)).toFixed(1)}h</span>
+          </div>
+        </div>
+      )}
+
+      {/* First poop of the day chart */}
+      {firstPoops.length > 0 && (
+        <div className="p-4 rounded-2xl bg-orange-50 border border-orange-200">
+          <div className="text-xs font-medium text-orange-600 uppercase tracking-wide mb-2">
+            First Poop of the Day
+          </div>
+          <ScatterChart
+            points={firstPoops.map((d) => ({
+              x: d.timestamp,
+              y: d.timeOfDayHours,
+              label: d.timeFormatted,
+            }))}
+            yLabel="Time"
+            color="#ea580c"
+            height={160}
+            yTickFormatter={(v) => {
+              const h = Math.floor(v);
+              const period = h < 12 ? "AM" : "PM";
+              const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+              return `${h12}${period}`;
+            }}
+          />
+          <div className="mt-2 flex gap-4 text-xs text-orange-700">
+            <span>Earliest: {formatHourMinute(Math.min(...firstPoops.map((d) => d.timeOfDayHours)))}</span>
+            <span>Avg: {formatHourMinute(firstPoops.reduce((s, d) => s + d.timeOfDayHours, 0) / firstPoops.length)}</span>
+            <span>Latest: {formatHourMinute(Math.max(...firstPoops.map((d) => d.timeOfDayHours)))}</span>
           </div>
         </div>
       )}
